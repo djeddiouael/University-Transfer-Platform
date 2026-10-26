@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   fix-npm:
-    name: Fix npm vulnerabilities
+    name: Repair lockfile and audit dependencies
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
+
+      - name: Repair package lock
+        run: npm install --package-lock-only --ignore-scripts --no-audit
 
       - name: Install dependencies
         run: npm ci
@@ -32,41 +34,32 @@ jobs:
         run: npm audit fix
         continue-on-error: true
 
-      - name: Report remaining vulnerabilities
+      - name: Check remaining vulnerabilities
         run: npm audit
         continue-on-error: true
 
-      - name: Verify dependency versions
+      - name: Check Laravel Mix and webpack
         run: npm ls laravel-mix webpack webpack-cli || true
 
-      - name: Update lockfile if needed
-        run: |
-          npm install --package-lock-only --ignore-scripts
-        continue-on-error: true
-
-      - name: Show dependency changes
-        run: |
-          git status --short
-          git diff --stat
-          git diff -- package.json package-lock.json
+      - name: Build frontend
+        run: npm run prod --if-present
 
       - name: Create pull request
+        if: always()
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: Final
           branch: security/npm-audit-fixes
           delete-branch: false
-          title: 'security: update npm dependencies'
-          commit-message: 'security: update npm dependency lockfile'
+          title: 'security: repair npm lockfile and update dependencies'
+          commit-message: 'security: repair npm lockfile'
           body: |
-            ## Security dependency review
+            Repairs the npm lockfile and attempts compatible
+            security updates.
 
-            - Attempt compatible npm security fixes.
-            - Report remaining audit findings.
-            - Review dependency and lockfile changes.
-            - Verify Laravel Mix and webpack compatibility
-              before merging.
+            Review the audit report and verify the frontend build
+            before merging.
           add-paths: |
             package.json
             package-lock.json
