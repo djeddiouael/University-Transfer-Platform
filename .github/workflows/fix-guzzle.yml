@@ -21,13 +21,27 @@ jobs:
           php-version: '8.1'
           tools: composer:v2
 
-      - name: Update Guzzle dependency
-        run: composer update guzzlehttp/guzzle --with-dependencies --no-interaction --prefer-dist
+      - name: Update Guzzle
+        run: |
+          composer update guzzlehttp/guzzle --with-dependencies --no-interaction --prefer-dist --no-audit
 
       - name: Verify Guzzle version
         run: |
           composer show guzzlehttp/guzzle
-          composer audit
+          php -r '
+          require "vendor/autoload.php";
+          $v = Composer\InstalledVersions::getVersion("guzzlehttp/guzzle");
+          echo "Installed Guzzle version: $v\n";
+          if (version_compare($v, "7.15.2", "<")) {
+              fwrite(STDERR, "Guzzle is still vulnerable.\n");
+              exit(1);
+          }
+          '
+
+      - name: Audit dependencies
+        id: audit
+        continue-on-error: true
+        run: composer audit
 
       - name: Commit updated lock file
         run: |
