@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "body-parser": "^2.4.0",
-    "node-forge": "^1.4.1",
+    "node-forge": "^1.4.0",
     "turbolinks": "^5.2.0",
     "ws": "^8.22.0"
   },
@@ -36,7 +36,7 @@
     "elliptic": "^6.6.1",
     "json5": "^2.2.3",
     "lodash": "^4.18.1",
-    "node-forge": "^1.4.1",
+    "node-forge": "^1.4.0",
     "pbkdf2": "^3.1.3",
     "proxy-addr": "^2.0.8",
     "serialize-javascript": "^7.1.4",
