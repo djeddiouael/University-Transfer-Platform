@@ -1,0 +1,42 @@
+
+name: Fix Guzzle Security Vulnerability
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-guzzle:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+
+      - name: Update Guzzle dependency
+        run: composer update guzzlehttp/guzzle --with-dependencies --no-interaction --prefer-dist
+
+      - name: Verify Guzzle version
+        run: |
+          composer show guzzlehttp/guzzle
+          composer audit
+
+      - name: Commit updated lock file
+        run: |
+          if ! git diff --quiet -- composer.lock; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add composer.lock
+            git commit -m "fix: update Guzzle security dependency"
+            git push
+          else
+            echo "No composer.lock changes detected"
+          fi
