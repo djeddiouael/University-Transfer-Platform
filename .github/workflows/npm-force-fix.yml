@@ -1,0 +1,30 @@
+name: NPM Force Fix
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Clean and reinstall
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --legacy-peer-deps || npm install
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json package.json
+          git diff --cached --quiet || git commit -m "chore: force secure versions via overrides (clean install)"
+          git push
