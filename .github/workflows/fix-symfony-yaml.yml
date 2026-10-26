@@ -1,7 +1,6 @@
-```yaml
 name: Fix Symfony YAML
 
-on:
+'on':
   workflow_dispatch:
 
 permissions:
@@ -9,6 +8,7 @@ permissions:
 
 jobs:
   update-yaml:
+    name: Update Symfony YAML dependency
     runs-on: ubuntu-latest
 
     steps:
@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: Final
+          persist-credentials: true
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -23,13 +24,16 @@ jobs:
           php-version: '8.1'
           tools: composer:v2
 
+      - name: Validate Composer files
+        run: composer validate --no-check-publish
+
       - name: Update Symfony YAML
         run: composer update symfony/yaml --with-dependencies --no-interaction --prefer-dist --no-audit
 
-      - name: Check updated version
+      - name: Show installed version
         run: composer show symfony/yaml
 
-      - name: Commit lockfile
+      - name: Commit updated lockfile
         run: |
           if ! git diff --quiet -- composer.lock; then
             git config user.name "github-actions[bot]"
