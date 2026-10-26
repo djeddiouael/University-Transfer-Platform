@@ -1,21 +1,24 @@
+
 {
-    "private": true,
-    "scripts": {
-        "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "prod": "npm run production",
-        "production": "mix --production"
-    },
-    "devDependencies": {
-        "axios": "^0.21",
-        "laravel-mix": "^6.0.6",
-        "lodash": "^4.17.19",
-        "postcss": "^8.1.14"
-    },
-    "dependencies": {
-        "turbolinks": "^5.2.0"
-    }
+  "private": true,
+  "scripts": {
+    "dev": "npm run development",
+    "development": "mix",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "hot": "mix watch --hot",
+    "prod": "npm run production",
+    "production": "mix --production"
+  },
+  "devDependencies": {
+    "axios": "^0.21.4",
+    "laravel-mix": "^6.0.6",
+    "lodash": "^4.17.21",
+    "postcss": "^8.4.49",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "turbolinks": "^5.2.0"
+  }
 }
