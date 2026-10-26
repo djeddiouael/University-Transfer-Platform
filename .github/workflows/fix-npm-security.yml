@@ -1,0 +1,55 @@
+name: Fix npm Security
+
+'on':
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  fix-npm:
+    name: Fix compatible npm vulnerabilities
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Final
+        uses: actions/checkout@v4
+        with:
+          ref: Final
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply compatible security fixes
+        run: npm audit fix
+
+      - name: Check remaining vulnerabilities
+        run: npm audit --audit-level=critical
+        continue-on-error: true
+
+      - name: Build frontend
+        run: npm run prod --if-present
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: Final
+          branch: security/npm-audit-fixes
+          delete-branch: true
+          title: 'security: fix compatible npm vulnerabilities'
+          commit-message: 'security: update vulnerable npm dependencies'
+          body: |
+            Automated compatible npm security updates.
+            Please review package-lock.json and test the application
+            before merging.
+          add-paths: |
+            package-lock.json
+            package.json
