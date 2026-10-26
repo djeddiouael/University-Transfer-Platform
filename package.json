@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "body-parser": "^2.4.0",
-    "node-forge": "^1.4.0",
+    "node-forge": "^1.4.1",
     "turbolinks": "^5.2.0",
     "ws": "^8.22.0"
   },
@@ -36,14 +36,17 @@
     "elliptic": "^6.6.1",
     "json5": "^2.2.3",
     "lodash": "^4.18.1",
-    "node-forge": "^1.4.0",
+    "node-forge": "^1.4.1",
     "pbkdf2": "^3.1.3",
     "proxy-addr": "^2.0.8",
     "serialize-javascript": "^7.1.4",
     "sha.js": "^2.4.12",
     "source-map-js": "^1.2.2",
     "svgo": "^4.1.0",
+    "uuid": "^14.0.0",
     "webpack": "^5.112.2",
+    "webpack-dev-middleware": "^8.3.0",
+    "webpack-dev-server": "^5.2.6",
     "ws": "^8.22.0"
   }
 }
