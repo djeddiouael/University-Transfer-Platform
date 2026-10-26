@@ -1,0 +1,42 @@
+```yaml
+name: Fix Symfony YAML
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-yaml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: Final
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+
+      - name: Update Symfony YAML
+        run: composer update symfony/yaml --with-dependencies --no-interaction --prefer-dist --no-audit
+
+      - name: Check updated version
+        run: composer show symfony/yaml
+
+      - name: Commit lockfile
+        run: |
+          if ! git diff --quiet -- composer.lock; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add composer.lock
+            git commit -m "fix: update symfony yaml dependency"
+            git push origin HEAD:Final
+          else
+            echo "No composer.lock changes to commit"
+          fi
