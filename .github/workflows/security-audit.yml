@@ -26,11 +26,32 @@ jobs:
           node-version: '20'
           cache: npm
 
-      - name: Install dependencies
+      - name: Verify npm files
+        run: |
+          test -f package.json
+          test -f package-lock.json
+
+      - name: Install npm dependencies
         run: npm ci
 
-      - name: Audit npm dependencies
+      - name: Check npm vulnerabilities
         run: npm audit --audit-level=high
+
+      - name: Build frontend
+        run: npm run production
+
+      - name: Upload npm audit report
+        if: always()
+        run: npm audit --json > npm-audit-report.json || true
+
+      - name: Save npm audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: npm-audit-report.json
+          if-no-files-found: ignore
+          retention-days: 7
 
   composer-audit:
     name: Audit Composer dependencies
@@ -47,11 +68,32 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Validate Composer files
+      - name: Verify Composer files
+        run: |
+          test -f composer.json
+          test -f composer.lock
+
+      - name: Validate Composer configuration
         run: composer validate --no-check-publish
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Check Composer platform requirements
+        run: composer check-platform-reqs
+
       - name: Audit Composer dependencies
         run: composer audit
+
+      - name: Upload Composer audit report
+        if: always()
+        run: composer audit --format=json > composer-audit-report.json || true
+
+      - name: Save Composer audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: composer-audit-report
+          path: composer-audit-report.json
+          if-no-files-found: ignore
+          retention-days: 7
