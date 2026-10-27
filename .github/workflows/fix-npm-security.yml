@@ -1,4 +1,4 @@
-```yaml
+
 name: Fix npm Security
 
 on:
@@ -100,4 +100,3 @@ jobs:
         run: |
           echo "Workflow finished."
           echo "Review the build, audit report, and pull request status."
-```
