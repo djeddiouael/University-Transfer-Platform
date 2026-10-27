@@ -23,43 +23,44 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
-      - name: Repair package lock
-        run: npm install --package-lock-only --ignore-scripts --no-audit
+      - name: Validate package files
+        run: |
+          test -f package.json
+          test -f package-lock.json
+          npm --version
+          node --version
 
       - name: Install dependencies
         run: npm ci
 
       - name: Apply compatible security fixes
-        run: npm audit fix
-        continue-on-error: true
+        run: npm audit fix --no-fund
 
-      - name: Check remaining vulnerabilities
-        run: npm audit
-        continue-on-error: true
+      - name: Check dependency tree
+        run: npm ls laravel-mix webpack webpack-cli elliptic node-forge || true
 
-      - name: Check Laravel Mix and webpack
-        run: npm ls laravel-mix webpack webpack-cli || true
-
-      - name: Build frontend
+      - name: Run production build
         run: npm run prod --if-present
 
+      - name: Audit remaining vulnerabilities
+        run: npm audit
+
       - name: Create pull request
-        if: always()
+        if: success()
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: Final
           branch: security/npm-audit-fixes
           delete-branch: false
-          title: 'security: repair npm lockfile and update dependencies'
-          commit-message: 'security: repair npm lockfile'
+          title: 'security: repair npm dependencies'
+          commit-message: 'security: update npm dependencies'
           body: |
-            Repairs the npm lockfile and attempts compatible
-            security updates.
-
-            Review the audit report and verify the frontend build
-            before merging.
+            Updates compatible npm dependencies and the lockfile.
+            The workflow must pass the production build and npm audit
+            before creating this pull request.
           add-paths: |
             package.json
             package-lock.json
